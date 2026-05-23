@@ -48,8 +48,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			Value:    "my-value",
 			Path:     "/",
 			Expires:  time.Now().Add(30 * time.Minute),
-			Secure:   false,
-			HttpOnly: true,
+			Secure:   true,
+			HttpOnly: true,                    // must be true in production or render will not set cookie
+			SameSite: http.SameSiteStrictMode, // important for cross-site login
 		}
 		// send cookie back to client
 		http.SetCookie(w, &cookie)
