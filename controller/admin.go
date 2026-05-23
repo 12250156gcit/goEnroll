@@ -61,11 +61,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Logout(w http.ResponseWriter, r *http.Request) {
 	cookie := http.Cookie{
 		Name:    "my-cookie",
+		Path:    "/",
 		Expires: time.Now(),
+		MaxAge:  -1,
 	}
 	http.SetCookie(w, &cookie)
 	httpResp.RespondWithJson(w, http.StatusOK, map[string]string{"status": "Logout success"})
+}
 
+func CheckAuth(w http.ResponseWriter, r *http.Request) {
+	if VerifyCookie(w, r) {
+		httpResp.RespondWithJson(w, http.StatusOK, map[string]bool{"authenticated": true})
+	}
 }
 
 // helper func to  vefiry the cookie

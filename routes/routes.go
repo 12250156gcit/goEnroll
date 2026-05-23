@@ -30,7 +30,9 @@ func InitializeRoutes() {
 	// signup and login
 	router.HandleFunc("/signup", controller.Signup).Methods("POST")
 	router.HandleFunc("/login", controller.Login).Methods("POST")
+	router.HandleFunc("/logout", controller.Logout)
 	router.HandleFunc("/loginout", controller.Logout)
+	router.HandleFunc("/check-auth", controller.CheckAuth).Methods("GET")
 
 	// enroll APIs
 	router.HandleFunc("/enroll", controller.Enroll).Methods("POST")
