@@ -7,14 +7,15 @@ function login(){
     fetch("/login", {
          method: "POST",
         body: JSON.stringify(data),
-        headers: {"content-Type": "application/json; charset=UTF-8"},
+        headers: {"Content-Type": "application/json; charset=UTF-8"},
         credentials: "include"
-    }).then(response => {
+    }).then(async response => {
         if(response.ok){
             window.open("student.html", "_self")
-        } else {
-            throw new Error(response.statusText)
+            return
         }
+        const body = await response.text()
+        throw new Error(body || response.statusText)
     }).catch(e => alert(e))
 }
 

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"myapp/model"
 	"myapp/utils/httpResp"
@@ -40,6 +41,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(admin)
 	getErr := admin.Get()
 	if getErr != nil {
+		if getErr == sql.ErrNoRows {
+			httpResp.RespondWithError(w, http.StatusUnauthorized, "invalid email or password")
+			return
+		}
 		httpResp.RespondWithError(w, http.StatusInternalServerError, getErr.Error())
 	} else {
 		// Create a cookie
@@ -49,8 +54,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			Path:     "/",
 			Expires:  time.Now().Add(30 * time.Minute),
 			Secure:   true,
-			HttpOnly: true,                    // must be true in production or render will not set cookie
-			SameSite: http.SameSiteStrictMode, // important for cross-site login
+			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode, // more compatible while remaining secure on Render
 		}
 		// send cookie back to client
 		http.SetCookie(w, &cookie)
@@ -60,10 +65,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 func Logout(w http.ResponseWriter, r *http.Request) {
 	cookie := http.Cookie{
-		Name:    "my-cookie",
-		Path:    "/",
-		Expires: time.Now(),
-		MaxAge:  -1,
+		Name:     "my-cookie",
+		Path:     "/",
+		Expires:  time.Now(),
+		MaxAge:   -1,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, &cookie)
 	httpResp.RespondWithJson(w, http.StatusOK, map[string]string{"status": "Logout success"})

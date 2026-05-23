@@ -14,12 +14,14 @@ function signUp(){
     fetch("/signup",{
         method: "POST",
         body: JSON.stringify(_data),
-        headers: {"Content-type": "application/json; charset=UFT-8"}
-    } ).then(response => {
+        headers: {"Content-Type": "application/json; charset=UTF-8"},
+        credentials: "include"
+    }).then(async response => {
         if(response.status == 201){
             window.open("index.html", "_self")
-        } else {
-            throw new Error(response.statusText)
+            return
         }
+        const body = await response.text()
+        throw new Error(body || response.statusText)
     }).catch(e => alert(e));
 }
